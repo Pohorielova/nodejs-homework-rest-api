@@ -1,62 +1,42 @@
-const fs = require("fs/promises");
-const path = require("path");
-const { nanoid } = require("nanoid");
-const contactsPath = path.join(__dirname, "contacts.json");
+const { Contact } = require("../db/model");
 
 const listContacts = async () => {
-  const result = await fs.readFile(contactsPath, "utf8");
-  return JSON.parse(result);
-};
-
-const getContactById = async (contactId) => {
-  const contacts = await listContacts();
-  const result = await contacts.find((data) => data.id === contactId);
-
+  const result = await Contact.find({});
   return result;
 };
 
-const removeContact = async (contactId) => {
-  const contacts = await listContacts();
-  const contact = contacts.filter((data) => data.id !== contactId);
-  const stringContact = JSON.stringify(contact);
+const getContactById = async (contactId) => {
+  return Contact.findById(contactId);
+};
 
-  await fs.writeFile(contactsPath, stringContact, "utf8");
+const removeContact = async (contactId) => {
+  return Contact.findByIdAndRemove(contactId);
 };
 
 const addContact = async (body) => {
-  const contacts = await listContacts();
-  const contact = {
-    id: nanoid(3),
-    name: body.name,
-    email: body.email,
-    phone: body.phone,
-  };
-  const newData = [];
-
-  newData.push(contact);
-  const contactsNew = [...contacts, ...newData];
-  const stringContacts = JSON.stringify(contactsNew);
-  await fs.writeFile(contactsPath, stringContacts, "utf8");
+  const { name, email, phone, favorite } = body;
+  return Contact.create({ name, email, phone, favorite });
 };
 
 const updateContact = async (contactId, body) => {
-  const contacts = await listContacts();
-  const idx = contacts.findIndex((data) => data.id === contactId);
-  if (idx === -1) {
-    return null;
-  }
-
-  contacts[idx] = { ...body, contactId };
-
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2), "utf8");
-
-  return contacts[idx];
+  const { name, email, phone } = body;
+  return Contact.findByIdAndUpdate(contactId, {
+    $set: { name, email, phone },
+    runValidators: true,
+  });
 };
-
+const updateStatusContact = async (contactId, body) => {
+  const { favorite } = body;
+  return Contact.findByIdAndUpdate(contactId, {
+    $set: { favorite },
+    runValidators: true,
+  });
+};
 module.exports = {
   listContacts,
   getContactById,
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact,
 };

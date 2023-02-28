@@ -1,31 +1,85 @@
-## GoIT Node.js Course Template Homework
+# Node.js REST API application for managing contacts
 
-Виконайте форк цього репозиторію для виконання домашніх завдань (2-6)
-Форк створить репозиторій на вашому http://github.com
+This is a Node.js REST API application for managing contacts using MongoDB and Mongoose. This application allows users to create, read, update, and delete contacts.
 
-Додайте ментора до колаборації
+## Requirements
 
-Для кожної домашньої роботи створюйте свою гілку.
+Node.js installed on your machine
+MongoDB instance running
+NPM package manager installed
 
-- hw02
-- hw03
-- hw04
-- hw05
-- hw06
+## Installation
 
-Кожна нова гілка для др повинна робитися з master
+1.Clone this repository or download the ZIP file and extract it to your desired directory.
+2.Navigate to the project directory using a terminal or command prompt.
+3.Run the following command to install the required dependencies: -`npm install`
+4.Create a .env file in the project directory and add the following variables:
 
-Після того, як ви закінчили виконувати домашнє завдання у своїй гілці, необхідно зробити пулл-реквест (PR). Потім додати ментора для рев'ю коду. Тільки після того, як ментор заапрувить PR, ви можете виконати мердж гілки з домашнім завданням у майстер.
+```env
+DB_HOST=<your mongodb uri>
+PORT=<your desired port>
+```
 
-Уважно читайте коментарі ментора. Виправте зауваження та зробіть коміт у гілці з домашнім завданням. Зміни підтягнуться у PR автоматично після того, як ви відправите коміт з виправленнями на github
-Після виправлення знову додайте ментора на рев'ю коду.
+5.Start the server by running the following command:
 
-- При здачі домашньої роботи є посилання на PR
-- JS-код чистий та зрозумілий, для форматування використовується Prettier
+```env
+npm start
+```
 
-### Команди:
+6.You should see a message indicating that the server has started and is listening on the specified port.
 
-- `npm start` &mdash; старт сервера в режимі production
-- `npm run start:dev` &mdash; старт сервера в режимі розробки (development)
-- `npm run lint` &mdash; запустити виконання перевірки коду з eslint, необхідно виконувати перед кожним PR та виправляти всі помилки лінтера
-- `npm lint:fix` &mdash; та ж перевірка лінтера, але з автоматичними виправленнями простих помилок
+## API endpoints
+
+GET /api/contacts - Returns a list of all contacts.
+
+POST /api/contacts - Creates a new contact.
+
+GET /api/contacts/:contactId - Returns a single contact with the specified ID.
+
+PUT /api/contacts/:contactId - Updates a single contact with the specified ID.
+
+DELETE /api/contacts/:contactId - Deletes a single contact with the specified ID.
+
+PATCH /api/contacts/:contactId/favorite - Updates only keys "favorite" in a single contact with the specified ID.
+
+## Example usage
+
+To create a new contact:
+
+```json
+POST /api/contacts
+{
+"name": "John Doe",
+"email": "johndoe@example.com",
+"phone": "123-456-7890"
+}
+```
+
+To retrieve all contacts:
+
+```json
+GET /api/contacts
+```
+
+To retrieve a single contact with ID 123:
+
+```json
+GET /api/contacts/123
+```
+
+To update a single contact with ID 123:
+
+```json
+PUT /api/contacts/123
+{
+"name": "John Doe",
+"email": "johndoe@example.com",
+"phone": "111-222-3333"
+}
+```
+
+To delete a single contact with ID 123:
+
+```json
+DELETE /api/contacts/123
+```
