@@ -18,6 +18,7 @@ NPM package manager installed
 ```env
 DB_HOST=<your mongodb uri>
 PORT=<your desired port>
+SECRET_KEY=<your secret key>
 ```
 
 5.Start the server by running the following command:
