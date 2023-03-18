@@ -6,9 +6,13 @@ const {
   removeToken,
   updateSubscription,
 } = require("../models/users");
-
+const { User } = require("../db/modelUser");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
+const path = require("path");
+const fs = require("fs/promises");
+const avatarSize = require("../helpers/avatarSizeHelpers");
 
 const registrationAction = async (req, res, next) => {
   try {
@@ -19,8 +23,8 @@ const registrationAction = async (req, res, next) => {
         message: "Email in use",
       });
     }
-
-    const newUser = await register(email, password);
+    const avatarURL = gravatar.url(email);
+    const newUser = await register(email, password, avatarURL);
     return res.status(201).json({
       user: newUser,
     });
@@ -104,10 +108,27 @@ const updateSubscriptionAction = async (req, res, next) => {
   }
 };
 
+const avatarsDir = path.join(__dirname, "../", "public", "avatars");
+const updateAvatar = async (req, res) => {
+  const { _id } = req.user;
+  const { path: tempUpload, originalname } = req.file;
+  const filename = `${_id}_${originalname}`;
+  const resultUpload = path.join(avatarsDir, filename);
+  await fs.rename(tempUpload, resultUpload);
+  await avatarSize(resultUpload);
+  const avatarURL = path.join("avatars", filename);
+  //
+  await User.findByIdAndUpdate(_id, { avatarURL });
+  res.json({
+    avatarURL,
+  });
+};
+
 module.exports = {
   registrationAction,
   loginAction,
   logoutAction,
   getCurrentUserAction,
   updateSubscriptionAction,
+  updateAvatar,
 };
