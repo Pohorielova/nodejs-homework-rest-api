@@ -6,6 +6,7 @@ const {
   registerNewUserValidation,
   loginValidation,
   subscriptionValidation,
+  emailValidation,
 } = require("../../middlewares/validation");
 
 const { authenticate } = require("../../middlewares/authenticate");
@@ -20,6 +21,8 @@ const {
   getCurrentUserAction,
   updateSubscriptionAction,
   updateAvatar,
+  verifyEmail,
+  resendVerifyEmail,
 } = require("../../controllers/authCtr");
 
 router.post(
@@ -27,6 +30,8 @@ router.post(
   registerNewUserValidation,
   asyncWrapper(registrationAction)
 );
+router.get("/users/verify/:verificationToken", asyncWrapper(verifyEmail));
+router.post("/users/verify/", emailValidation, asyncWrapper(resendVerifyEmail));
 router.post("/users/login", loginValidation, asyncWrapper(loginAction));
 router.post("/users/logout", authenticate, asyncWrapper(logoutAction));
 router.get("/users/current", authenticate, asyncWrapper(getCurrentUserAction));

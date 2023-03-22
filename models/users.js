@@ -1,10 +1,11 @@
 const { User } = require("../db/modelUser");
 
-const register = async (email, password, avatarURL) => {
+const register = async (email, password, avatarURL, verificationToken) => {
   const user = await new User({
     email,
     password,
     avatarURL,
+    verificationToken,
   });
   return user.save();
 };

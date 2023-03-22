@@ -13,6 +13,10 @@ const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs/promises");
 const avatarSize = require("../helpers/avatarSizeHelpers");
+const { nanoid } = require("nanoid");
+const sendEmail = require("../helpers/nodemailer");
+require("dotenv").config();
+const { BASE_URL } = process.env;
 
 const registrationAction = async (req, res, next) => {
   try {
@@ -24,13 +28,62 @@ const registrationAction = async (req, res, next) => {
       });
     }
     const avatarURL = gravatar.url(email);
-    const newUser = await register(email, password, avatarURL);
+    const verificationToken = nanoid();
+    const newUser = await register(
+      email,
+      password,
+      avatarURL,
+      verificationToken
+    );
+    const verifyEmail = {
+      to: email,
+      subject: "Verify you email",
+      html: `<a target="_blank" href="${BASE_URL}/api/auth/users/verify/${verificationToken}"> Click to verify your email</a>`,
+    };
+    await sendEmail(verifyEmail);
     return res.status(201).json({
       user: newUser,
     });
   } catch (error) {
     next(error.message);
   }
+};
+
+const verifyEmail = async (req, res) => {
+  const { verificationToken } = req.params;
+  const user = await User.findOne({ verificationToken });
+  if (!user) {
+    return res.status(404).json({
+      message: "'User not found",
+    });
+  }
+  await User.findByIdAndDelete(user._id, {
+    verify: true,
+    verificationToken: "",
+  });
+  res.json({ message: "Verification successful" });
+};
+
+const resendVerifyEmail = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(404).json({
+      message: "'User not found",
+    });
+  }
+  if (user.verify) {
+    return res.status(400).json({
+      message: "Verification has already been passed",
+    });
+  }
+  const verifyEmail = {
+    to: email,
+    subject: "Verify you email",
+    html: `<a target="_blank" href="${BASE_URL}/api/auth/users/verify/${user.verificationToken}"> Click to verify your email</a>`,
+  };
+  await sendEmail(verifyEmail);
+  res.json({ message: "Verification email sent" });
 };
 
 const loginAction = async (req, res, next) => {
@@ -131,4 +184,6 @@ module.exports = {
   getCurrentUserAction,
   updateSubscriptionAction,
   updateAvatar,
+  verifyEmail,
+  resendVerifyEmail,
 };
