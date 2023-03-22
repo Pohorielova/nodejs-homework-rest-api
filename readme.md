@@ -19,6 +19,8 @@ NPM package manager installed
 DB_HOST=<your mongodb uri>
 PORT=<your desired port>
 SECRET_KEY=<your secret key>
+EMAIL_PASSWORD=< password of email service>
+BASE_URL=<for example http://localhost:3000>
 ```
 
 5.Start the server by running the following command:
